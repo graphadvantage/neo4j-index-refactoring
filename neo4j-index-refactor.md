@@ -74,7 +74,7 @@ We'll make a graph with 1M child nodes and refactor it to a parent category in u
 To control the scope of the refactor cartesian, we'll pass the property values as parameters to match on index for both parent and child, and then loop through the indexed result set creating the relationships in smaller batches.  These combined approaches provide efficient memory management and disk reads during refactoring, maximizing throughput.
 
 
-#Step 1. Make the Test Graph
+##Step 1. Make the Test Graph
 
 So let's start by creating a graph, here we'll use the GraphAware GraphGen plugin (https://github.com/graphaware/neo4j-graphgen-procedure) to make 1M Organization nodes, and give them a randomly assigned country property.
 
