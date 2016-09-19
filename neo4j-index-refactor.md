@@ -1,6 +1,6 @@
-## Neo4j Category Refactoring for Large Graphs using Bolt, Indexes & Batching
+##Neo4j Category Refactoring for Large Graphs using Bolt, Indexes & Batching
 
-# Refactor 1M Nodes in 30 Seconds with Neo4j Indexes
+#Refactor 1M Nodes in 30 Seconds with Neo4j Indexes
 
 ##Introduction
 
@@ -64,16 +64,16 @@ This is, of course, the dreaded cartesian join -- painful, but unavoidable if we
 The secret to managing these kind of cartesian joins in a large graph is to use Neo4j indexes...
 
 
-##  GraphGist: Neo4j Category Refactoring for Large Graphs using Bolt, Indexes & Batching
+##GraphGist: Neo4j Category Refactoring for Large Graphs using Bolt, Indexes & Batching
 
 In this Gist, I'll show you how to leverage some newer Neo4j capabilities to efficiently refactor a large graph.
 
 We'll make a graph with 1M child nodes and using Python Bolt, refactor it to a parent category in under 30 sec (which is what I got on my MacBook).
 
 
-## TopLine:
+##TopLine
 
-To control the scope of the refactor cartesian, we'll pass the property values as parameters to match on index for both parent and child, and then loop through the indexed result set creating the relationships in smaller batches.  These combined approaches provide efficient memory management and disk reads during refactoring, maximizing throughput.
+To control the scope of cartesian joins in refactoring, we'll pass the property values as parameters to match on index for both parent and child, and then loop through the indexed result set creating the relationships in smaller batches.  These combined approaches provide efficient memory management and disk reads during refactoring, maximizing throughput.
 
 
 ##Step 1. Make the Test Graph
