@@ -78,7 +78,7 @@ To control the scope of cartesian joins in refactoring, we'll pass the property 
 
 ##Step 1. Make the Test Graph
 
-So let's start by creating a graph, here we'll use the GraphAware GraphGen plugin to make 1M (:Organization) nodes, and give them a randomly assigned {country: "..."} property (https://github.com/graphaware/neo4j-graphgen-procedure) ß
+So let's start by creating a graph, here we'll use the GraphAware GraphGen plugin to make 1M (:Organization) nodes, and give them a randomly assigned {country: "..."} property (https://github.com/graphaware/neo4j-graphgen-procedure).
 
 You'll need a running Neo4j instance, and you'll need to compile the graphgen .jar file and add it to Neo4j/plugins and restart Neo4j.
 
