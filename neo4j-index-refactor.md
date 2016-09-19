@@ -2,6 +2,8 @@
 
 #Refactor 1M Nodes in 30 Seconds with Neo4j Indexes
 
+<img width="719" alt="refactor" src="https://cloud.githubusercontent.com/assets/5991751/18645738/3982a61a-7e63-11e6-8720-7f670dca3378.png">
+
 ##Introduction
 
 Sometimes it is necessary to refactor a node property as a new hierarchy. This involves extracting the unique values of the property from child nodes, creating the new parent category nodes, and then the setting the relationship between the matching parent and child nodes.
