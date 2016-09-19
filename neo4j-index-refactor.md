@@ -45,7 +45,7 @@ CALL apoc.refactor.categorize('country','HAS_LOCATION',true,'Country','countryNa
 RETURN 'Done!'
 ```
 
-However, for large graphs both of these approaches can be computationally expensive and  v-e-r-y<span>&nbsp</span>s-l-o-w.
+However, for large graphs both of these approaches can be computationally expensive and  v-e-r-y s-l-o-w.
 
 I recently built a large graph that had over 450M nodes and over 2B relationships. The size of the graph on disk exceeded the server's available memory page cache so any refactoring required a lot of disk reads.
 
