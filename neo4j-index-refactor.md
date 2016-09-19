@@ -72,7 +72,8 @@ We'll make a graph with 1M child nodes and refactor it to a parent category in u
 
 To control the scope of the refactor cartesian, we'll pass the property values as parameters to match on index for both parent and child, and then loop through the indexed result set creating the relationships in smaller batches.  These combined approaches provide efficient memory management and disk reads during refactoring, maximizing throughput.
 
-***Make a Test Graph***
+
+#Make the Test Graph
 
 So let's start by creating a graph, here we'll use the GraphAware GraphGen plugin (https://github.com/graphaware/neo4j-graphgen-procedure) to make 1M Organization nodes, and give them a randomly assigned country property.
 
@@ -128,7 +129,7 @@ processing...
 -----------------
 ```
 
-***Set Indexes and Constraints***
+##Set Indexes and Constraints
 
 The way that we can control the scope of the cartesian join is to make sure we have access to indexes for both the child property that needs refactoring and the new parent category.  
 
@@ -201,7 +202,8 @@ processing...
 -----------------
 ```
 
-**Graph Warmup**
+##Graph Warmup
+
 This is an optional step for this Gist, but in a large graph you can see better results prior to refactoring if you can load some of the graph into memory.
 
 The output of this script will show you how much of the graph is actually in memory per your neo4j.conf page cache settings.
@@ -263,7 +265,7 @@ processing...
 -----------------
 ```
 
-***Extract Parent Category Nodes from Child Properties***
+##Extract Parent Category Nodes from Child Properties
 
 Next, we need to create as many parent category nodes as there are unique property values in the child nodes.
 
@@ -353,11 +355,13 @@ processing...
 -----------------
 ```
 
-***Refactoring***
+##Fast Refactoring
 
 So now we are set for refactoring - this script has two parts, first we are going to gather some statistics about the child nodes, second we'll refactor using the property value as a parameter for doing an index-based match for both parent and nodes.  Batching makes the commits managable and fast.
 
-We are matching all the children to a single category parent node constrained by the indexed results.
+The key aspect here is that we are matching all the children to a ***single category parent node*** with all matched nodes constrained by the indexed results.
+
+This produces the smallest cartesian possible, and is quite fast due to the single parent.
 
 I did fairly extensive testing and found that this method is much faster compared to joining children to several parents at once - i.e. using batching but not constraining the batches to single index value.
 
@@ -459,9 +463,11 @@ finally:
 
 ##Summary##
 
-Using indexes greatly improves performance of Neo4j operations like refactoring where cartesian joins are unavoidable. With Python scripting, we can leverage Neo4j's parameter support and Bolt interface to more closely control exactly how memory and disk are being used, which pays off for doing these kinds of heavy-lift operations in a large graph.
+Using indexes greatly improves performance of Neo4j operations like refactoring where cartesian joins are unavoidable.
 
-All the scripts used here are included, as well as a Jupyter notebook.
+With Python scripting, we can leverage Neo4j's parameter support and Bolt interface to more closely control exactly how memory and disk are being used, which pays off for doing these kinds of heavy-lift operations in a large graph.
+
+All the scripts used here are included, and are consolidated in a Jupyter notebook as well.
 
 
 ##Thanks
