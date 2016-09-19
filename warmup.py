@@ -16,7 +16,7 @@ driver = GraphDatabase.driver("bolt://localhost",
 session = driver.session()
 
 
-warmpup1 = '''
+warmup1 = '''
 CALL apoc.warmup.run();
 '''
 

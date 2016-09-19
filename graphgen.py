@@ -17,8 +17,7 @@ driver = GraphDatabase.driver("bolt://localhost",
 session = driver.session()
 
 
-generate1 =
-'''
+generate1 = '''
 CALL generate.nodes('Organization', '{name: companyName, country: country}', 1000000)
 '''
 
