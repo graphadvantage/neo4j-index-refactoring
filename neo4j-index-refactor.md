@@ -4,7 +4,7 @@
 
 ##Introduction
 
-Sometimes it is necessary to refactor a node property as a new hierarchy. This involves extracting the unique values of the property from child nodes, creating the new parent category nodes, and the setting the relationship between the matching parent and child nodes.
+Sometimes it is necessary to refactor a node property as a new hierarchy. This involves extracting the unique values of the property from child nodes, creating the new parent category nodes, and then the setting the relationship between the matching parent and child nodes.
 
 
 Let's suppose we have an (:Organization) node that has a {country: "..."} property, and we want to refactor to a (:Country) parent category, and create a new [:HAS_LOCATION] relationship between the two:
@@ -37,7 +37,7 @@ AND NOT ((n)-[:HAS_LOCATION]-())
 WITH c,n MERGE (c)<-[r:HAS_LOCATION]-(n)
 ```
 
-In small graphs this is a trivial operation, and thanks to the Michael Hunger and the APOC team you perform refactoring using just single statement, which will also delete the extracted property from the children, and copy over any other needed hierarchy properties from children to the parent (such as `['area']`), in configurable batches:
+In small graphs this is a trivial operation.  And thanks to the Michael Hunger and the APOC team, you can even perform refactoring using just single statement, which will also delete the extracted property from the children, and copy over any other needed properties from children to the parent (such as `['area']`), and run in configurable batches:
 
 ```
 MATCH (n:Organization)
@@ -45,9 +45,11 @@ CALL apoc.refactor.categorize('country','HAS_LOCATION',true,'Country','countryNa
 RETURN 'Done!'
 ```
 
-However, for large graphs both of these approaches can be computationally expensive and v e r y   s l o w.
+However, for large graphs both of these approaches can be computationally expensive and  v--e--r--y   s--l--o--w.
 
-I recently had the opportunity to build a large graph with 450M nodes and over 2B relationships. The size of the graph on disk exceeded the server's available memory page cache so any refactoring required a lot of disk reads. Plus, as in this exercise, I needed to refactor :Organizations to :Country, and there were 260M Organization records and only 244 Countries, so each (:Country) node would be a dense node with an average of about 1M [:HAS_LOCATION] relationships per node.  (There are several approaches to managing dense nodes, but we're going to set aside that discussion for now...)
+I recently built a large graph that had over 450M nodes and over 2B relationships. The size of the graph on disk exceeded the server's available memory page cache so any refactoring required a lot of disk reads.
+
+Just as in this exercise, I needed to refactor (:Organizations) to (:Country), and with over 260M Organization records and only 244 Countries, each (:Country) node would be a dense node with an average of 1M [:HAS_LOCATION] relationships per node. (There are several approaches to managing dense nodes, but we're going to set aside that discussion for now...)
 
 The major cost comes from this statement in refactoring:
 
@@ -55,21 +57,22 @@ The major cost comes from this statement in refactoring:
 MATCH (c:Country), (n:Organization)
 ```
 
-This is of course a dreaded cartesian join -- unavoidable if we want to set the new parent child relationship.
+This is, of course, the dreaded cartesian join -- but unavoidable if we want to set the new parent child relationship.
 
-The secret to managing these kind of cartesian joins in a large graph is to use indexes...
+The secret to managing these kind of cartesian joins in a large graph is to use Neo4j indexes...
+
 
 ##  Graph Gist: Index-based Category Refactoring with Batches
 
 In this Gist, I'll show you how to leverage some newer Neo4j capabilities to efficiently refactor a large graph.
 
-We'll make a graph with 1M nodes and refactor it in under 30 sec (which is what I got on my MacBook)
+We'll make a graph with 1M child nodes and refactor it to a parent category in under 30 sec (which is what I got on my MacBook).
 
 ## TopLine:
 
 To control the scope of the refactor cartesian, we'll pass the property values as parameters to match on index for both parent and child, and then loop through the indexed result set creating the relationships in smaller batches.  These combined approaches provide efficient memory management and disk reads during refactoring, maximizing throughput.
 
-**Make a Test Graph**
+***Make a Test Graph***
 
 So let's start by creating a graph, here we'll use the GraphAware GraphGen plugin (https://github.com/graphaware/neo4j-graphgen-procedure) to make 1M Organization nodes, and give them a randomly assigned country property.
 
@@ -125,7 +128,7 @@ processing...
 -----------------
 ```
 
-**Set Indexes and Constraints**
+***Set Indexes and Constraints***
 
 The way that we can control the scope of the cartesian join is to make sure we have access to indexes for both the child property that needs refactoring and the new parent category.  
 
@@ -260,7 +263,7 @@ processing...
 -----------------
 ```
 
-**Extract Parent Category Nodes from Child Properties**
+***Extract Parent Category Nodes from Child Properties***
 
 Next, we need to create as many parent category nodes as there are unique property values in the child nodes.
 
@@ -350,7 +353,7 @@ processing...
 -----------------
 ```
 
-**Refactoring***
+***Refactoring***
 
 So now we are set for refactoring - this script has two parts, first we are going to gather some statistics about the child nodes, second we'll refactor using the property value as a parameter for doing an index-based match for both parent and nodes.  Batching makes the commits managable and fast.
 
