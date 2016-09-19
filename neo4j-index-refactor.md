@@ -49,7 +49,9 @@ However, for large graphs both of these approaches can be computationally expens
 
 I recently built a large graph that had 450 million nodes and 2 billion relationships. The size of the graph on disk exceeded the server's available memory page cache so any refactoring required a lot of disk reads.
 
-Just as in this exercise, I needed to refactor (:Organizations) to (:Country), and with 260M Organization nodes and only 244 Country nodes, each (:Country) node would be a dense node with an average of 1M [:HAS_LOCATION] relationships per node. (There are several approaches to managing dense nodes, but we're going to set aside that discussion for now...)
+Just as in this exercise, I needed to refactor (:Organizations) to (:Country), and with 260M Organization nodes and only 244 Country nodes, each (:Country) node would be a dense node with an average of 1M [:HAS_LOCATION] relationships per node.
+
+***(Note: There are several approaches to managing dense nodes, but we're going to set that discussion aside for now...)***
 
 The major cost comes from this statement in refactoring:
 
@@ -57,16 +59,16 @@ The major cost comes from this statement in refactoring:
 MATCH (c:Country), (n:Organization)
 ```
 
-This is, of course, the dreaded cartesian join -- but unavoidable if we want to set the new parent child relationship.
+This is, of course, the dreaded cartesian join -- painful, but unavoidable if we want to set the new parent-child relationship.
 
 The secret to managing these kind of cartesian joins in a large graph is to use Neo4j indexes...
 
 
-##  Graph Gist: Index-based Category Refactoring with Batches
+##  GraphGist: Neo4j Category Refactoring for Large Graphs using Bolt, Indexes & Batching
 
 In this Gist, I'll show you how to leverage some newer Neo4j capabilities to efficiently refactor a large graph.
 
-We'll make a graph with 1M child nodes and refactor it to a parent category in under 30 sec (which is what I got on my MacBook).
+We'll make a graph with 1M child nodes and using Python Bolt, refactor it to a parent category in under 30 sec (which is what I got on my MacBook).
 
 
 ## TopLine:
@@ -78,7 +80,7 @@ To control the scope of the refactor cartesian, we'll pass the property values a
 
 So let's start by creating a graph, here we'll use the GraphAware GraphGen plugin to make 1M Organization nodes, and give them a randomly assigned country property (https://github.com/graphaware/neo4j-graphgen-procedure) ß
 
-You'll need a running Neo4j instance, and you'll need to compile the graphgen .jar file and add it to Neo4j/plugins and restart Neo4j
+You'll need a running Neo4j instance, and you'll need to compile the graphgen .jar file and add it to Neo4j/plugins and restart Neo4j.
 
 This python script uses the Bolt driver.
 
@@ -277,7 +279,7 @@ In a large graph it may not be necessary to scan all of the child nodes to extra
 
 This script uses a random number to sample the graph (a nice trick courtesy of Michael Hunger).
 
-Note: I've included a cleanup query to delete the :Country nodes and relationships so you can run this multiple times.
+Note: I've included a cleanup query to delete the (:Country) nodes and relationships so you can run this multiple times.
 
 ```
 # STEP 4: Extract and create parent Category nodes
