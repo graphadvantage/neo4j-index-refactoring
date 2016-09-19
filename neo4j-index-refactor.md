@@ -47,9 +47,9 @@ RETURN 'Done!'
 
 However, for large graphs both of these approaches can be computationally expensive and  v-e-r-y s-l-o-w.
 
-I recently built a large graph that had over 450M nodes and over 2B relationships. The size of the graph on disk exceeded the server's available memory page cache so any refactoring required a lot of disk reads.
+I recently built a large graph that had 450 million nodes and 2 billion relationships. The size of the graph on disk exceeded the server's available memory page cache so any refactoring required a lot of disk reads.
 
-Just as in this exercise, I needed to refactor (:Organizations) to (:Country), and with over 260M Organization records and only 244 Countries, each (:Country) node would be a dense node with an average of 1M [:HAS_LOCATION] relationships per node. (There are several approaches to managing dense nodes, but we're going to set aside that discussion for now...)
+Just as in this exercise, I needed to refactor (:Organizations) to (:Country), and with 260M Organization nodes and only 244 Country nodes, each (:Country) node would be a dense node with an average of 1M [:HAS_LOCATION] relationships per node. (There are several approaches to managing dense nodes, but we're going to set aside that discussion for now...)
 
 The major cost comes from this statement in refactoring:
 
@@ -68,12 +68,13 @@ In this Gist, I'll show you how to leverage some newer Neo4j capabilities to eff
 
 We'll make a graph with 1M child nodes and refactor it to a parent category in under 30 sec (which is what I got on my MacBook).
 
+
 ## TopLine:
 
 To control the scope of the refactor cartesian, we'll pass the property values as parameters to match on index for both parent and child, and then loop through the indexed result set creating the relationships in smaller batches.  These combined approaches provide efficient memory management and disk reads during refactoring, maximizing throughput.
 
 
-#Make the Test Graph
+#Step 1. Make the Test Graph
 
 So let's start by creating a graph, here we'll use the GraphAware GraphGen plugin (https://github.com/graphaware/neo4j-graphgen-procedure) to make 1M Organization nodes, and give them a randomly assigned country property.
 
@@ -129,7 +130,8 @@ processing...
 -----------------
 ```
 
-##Set Indexes and Constraints
+
+##Step 2. Set Indexes and Constraints
 
 The way that we can control the scope of the cartesian join is to make sure we have access to indexes for both the child property that needs refactoring and the new parent category.  
 
@@ -202,7 +204,8 @@ processing...
 -----------------
 ```
 
-##Graph Warmup
+
+##Step 3. Graph Warmup
 
 This is an optional step for this Gist, but in a large graph you can see better results prior to refactoring if you can load some of the graph into memory.
 
@@ -265,7 +268,8 @@ processing...
 -----------------
 ```
 
-##Extract Parent Category Nodes from Child Properties
+
+##Step 4. Extract Parent Category Nodes from Child Properties
 
 Next, we need to create as many parent category nodes as there are unique property values in the child nodes.
 
@@ -355,7 +359,8 @@ processing...
 -----------------
 ```
 
-##Fast Refactoring
+
+## Step 5. Fast Refactoring
 
 So now we are set for refactoring - this script has two parts, first we are going to gather some statistics about the child nodes, second we'll refactor using the property value as a parameter for doing an index-based match for both parent and nodes.  Batching makes the commits managable and fast.
 
