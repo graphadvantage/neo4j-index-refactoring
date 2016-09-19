@@ -172,6 +172,60 @@ session.close()
 
 ```
 
+
+**Graph Warmup**
+This is an optional step for this Gist, but in a large graph you can see better results prior to refactoring if you can load some of the graph into memory.
+
+The output of this script will show you how much of the graph is actually in memory per your neo4j.conf page cache settings.
+
+This script require the APOC procedures plugin:
+
+https://neo4j-contrib.github.io/neo4j-apoc-procedures/
+
+
+```
+#STEP 3: (Optional)  Warmup Page Cache, helpful for large graphs
+# requires APOC procedures
+# https://neo4j-contrib.github.io/neo4j-apoc-procedures/
+
+#!pip install neo4j-driver
+
+import time
+
+from neo4j.v1 import GraphDatabase, basic_auth, TRUST_ON_FIRST_USE, CypherError
+
+driver = GraphDatabase.driver("bolt://localhost",
+                              auth=basic_auth("neo4j", "neo4j"),
+                              encrypted=False,
+                              trust=TRUST_ON_FIRST_USE)
+
+session = driver.session()
+
+
+warmup1 = '''
+CALL apoc.warmup.run();
+'''
+
+t0 = time.time()
+print("processing...")
+
+result = session.run(warmup1)
+
+for record in result:
+    print("%s" % (record))
+
+summary = result.consume()
+counters = summary.counters
+print(counters)
+
+print(round((time.time() - t0)*1000,1), " ms elapsed time")
+print('-----------------')
+
+session.close()
+
+```
+
+
 **Extract Parent Category Nodes from Child Properties**
 
 Next, we need to create as many parent category nodes as there are unique property values in the child nodes.
@@ -179,6 +233,8 @@ Next, we need to create as many parent category nodes as there are unique proper
 In a large graph it may not be necessary to scan all of the child nodes to extract the parent set.
 
 This script uses a random number to sample the graph (a nice trick courtesy of Michael Hunger).
+
+Note: I've included a cleanup query to delete the :Country nodes and relationships so you can run this multiple times.
 
 ```
 # STEP 4: Extract and create parent Category nodes
@@ -250,7 +306,9 @@ session.close()
 
 So now we are set for refactoring - this script has two parts, first we are going to gather some statistics about the child nodes, second we'll refactor using the property value as a parameter for doing an index-based match for both parent and nodes.  Batching makes the commits managable and fast.
 
-A key aspect is that we are matching all the children to a single category parent node constrained by the indexed results. I did fairly extensive testing and found that this method is much faster compared to joining children to several parents at once.
+We are matching all the children to a single category parent node constrained by the indexed results.
+
+I did fairly extensive testing and found that this method is much faster compared to joining children to several parents at once - i.e. using batching but not constraining the batches to single index value.
 
 In the large graph I set fairly large batch sizes ~ 100K or more
 
