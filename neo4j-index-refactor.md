@@ -73,7 +73,7 @@ We'll make a graph with 1M child nodes and using Python Bolt, refactor it to a p
 
 ##TopLine
 
-To control the scope of cartesian joins in refactoring, we'll pass the property values as parameters to match on index for both parent and child, and then loop through the indexed result set creating the relationships in smaller batches.  These combined approaches provide efficient memory management and disk reads during refactoring, maximizing throughput.
+To control the scope of cartesian joins in refactoring, we'll pass the property values as parameters to match on index for both parent and child, and then loop through the indexed result set creating the relationships in smaller batches.  These combined approaches provide efficient memory management and disk reads/writes during refactoring, maximizing throughput.
 
 
 ##Step 1. Make the Test Graph
