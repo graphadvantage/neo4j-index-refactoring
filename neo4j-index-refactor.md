@@ -279,7 +279,7 @@ In a large graph it may not be necessary to scan all of the child nodes to extra
 
 This script uses a random number to sample the graph (a nice trick courtesy of Michael Hunger).
 
-Note: I've included a cleanup query to delete the (:Country) nodes and relationships so you can run this multiple times.
+***(Note: I've included a cleanup query to delete the (:Country) nodes and relationships so you can run Steps 4 & 5 multiple times.)***
 
 ```
 # STEP 4: Extract and create parent Category nodes
