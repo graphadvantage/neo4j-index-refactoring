@@ -468,6 +468,7 @@ finally:
 
 ```
 
+
 ##Summary##
 
 Using indexes greatly improves performance of Neo4j operations like refactoring where cartesian joins are unavoidable.
@@ -482,7 +483,7 @@ All the scripts used here are included, and are consolidated in a Jupyter notebo
 Special thanks to Michael Kilgore of InfoClear Consulting, who helped with this work and to Michael Hunger, who got me thinking about refactoring...
 
 
-Example output:
+##Refactor Example Output
 
 ```
 processing ---> getting child property list for refactoring
