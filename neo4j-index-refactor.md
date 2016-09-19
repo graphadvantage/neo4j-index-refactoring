@@ -215,7 +215,7 @@ This is an optional step for this Gist, but in a large graph you can see better 
 
 The output of this script will show you how much of the graph is actually in memory per your neo4j.conf page cache settings.
 
-This script require the APOC procedures plugin:
+This script requires the APOC procedures plugin:
 
 https://neo4j-contrib.github.io/neo4j-apoc-procedures/
 
