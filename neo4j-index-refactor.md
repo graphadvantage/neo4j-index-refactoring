@@ -1,14 +1,13 @@
 ## Neo4j Category Refactoring for Large Graphs using Bolt, Indexes & Batching
 
-# How to Refactor 1M Nodes in 30 Seconds with Neo4j Indexes
+# Refactor 1M Nodes in 30 Seconds with Neo4j Indexes
 
 ##Introduction
 
-Sometimes it is necessary to refactor a node property as a new hierarchy- extracting the unique values of the property from child nodes, creating the new parent category nodes, and the setting the relationship between the matching parent and child nodes.
+Sometimes it is necessary to refactor a node property as a new hierarchy. This involves extracting the unique values of the property from child nodes, creating the new parent category nodes, and the setting the relationship between the matching parent and child nodes.
 
-In small graphs this is a trivial operation, and thanks to the Michael Hunger and APOC team there are even procedures available to perform refactoring with a single statement.
 
-Let's suppose we have an (:Organization) node that has a {country: "..."} property, and we want to refactor to a (:Country) parent category, and create a [:HAS_LOCATION] relationship between the two:
+Let's suppose we have an (:Organization) node that has a {country: "..."} property, and we want to refactor to a (:Country) parent category, and create a new [:HAS_LOCATION] relationship between the two:
 
 ```
 (:Organization)-[:HAS_LOCATION]->(:Country)
